@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Publication Firestore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-1: #ffffff;
+      --bg-2: #ffffff;
+      --card: #ffffff;
+      --text: #111111;
+      --muted: #4a4a4a;
+      --primary: #2b2b2b;
+      --primary-strong: #1a1a1a;
+      --success: #2f2f2f;
+      --danger: #3a3a3a;
+      --border: #d4d4d4;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", sans-serif;
+      color: var(--text);
+      background: #ffffff;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: min(720px, 100%);
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    #status {
+      margin: 14px 0 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #f2f2f2;
+      color: #2f2f2f;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    #status.connected {
+      background: #e9e9e9;
+      color: #1f1f1f;
+    }
+
+    #status.disconnected {
+      background: #f0f0f0;
+      color: #4a4a4a;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font: inherit;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.08s ease, opacity 0.15s ease, background 0.18s ease;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button:disabled,
+    input:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    #loginBtn, #postForm button {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    #loginBtn:hover, #postForm button:hover {
+      background: var(--primary-strong);
+    }
+
+    #signupBtn {
+      background: #3a3a3a;
+      color: #fff;
+    }
+
+    #logoutBtn {
+      background: #dc2626;
+      color: #fff;
+      border: 1px solid #b91c1c;
+    }
+
+    @media (max-width: 560px) {
+      .card { padding: 16px; }
+      .btn-row > button { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="card">
+      <h1>Publication Firebase</h1>
+      <p class="subtitle">Connecte-toi pour publier un message dans Firestore.</p>
+      <p id="status" class="disconnected">Non connecté</p>
+    </section>
+
+    <section class="card">
+      <form id="authForm" class="form-grid">
+        <input id="emailInput" type="email" placeholder="Email" required />
+        <input id="passwordInput" type="password" placeholder="Mot de passe" required />
+        <div class="btn-row">
+          <button type="button" id="signupBtn">Inscription</button>
+          <button type="submit" id="loginBtn">Connexion</button>
+          <button type="button" id="logoutBtn">Déconnexion</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <!-- Ce formulaire servira à envoyer un message -->
+      <form id="postForm" class="form-grid" style="display:none;">
+        <input id="messageInput" type="text" placeholder="Ton message..." required />
+        <button>Publier</button>
+      </form>
+    </section>
+  </main>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
