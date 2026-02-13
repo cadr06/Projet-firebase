@@ -3,7 +3,10 @@ import {
   getFirestore,
   collection,
   addDoc,
-  serverTimestamp
+  serverTimestamp,
+  query,
+  orderBy,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import {
   getAuth,
@@ -37,6 +40,8 @@ const signupBtn = document.getElementById("signupBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 const postForm = document.getElementById("postForm");
 const messageInput = document.getElementById("messageInput");
+const messagesSection = document.getElementById("messagesSection");
+const messagesContainer = document.getElementById("messages");
 
 // Petite sécurité si un élément manque dans le HTML
 if (
@@ -53,6 +58,52 @@ if (
 }
 
 let currentUser = null;
+let unsubscribeMessages = null;
+
+function stopMessagesListener() {
+  if (unsubscribeMessages) {
+    unsubscribeMessages();
+    unsubscribeMessages = null;
+  }
+
+  if (messagesContainer) {
+    messagesContainer.innerHTML = "";
+  }
+}
+
+function startMessagesListener() {
+  if (!messagesContainer || unsubscribeMessages) return;
+
+  const q = query(
+    collection(db, "messages"),
+    orderBy("timestamp", "desc")
+  );
+
+  unsubscribeMessages = onSnapshot(q, (snapshot) => {
+    messagesContainer.innerHTML = "";
+
+    if (snapshot.empty) {
+      messagesContainer.innerHTML = "<p>Aucun message pour le moment.</p>";
+      return;
+    }
+
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+
+      const div = document.createElement("div");
+      div.style.padding = "10px";
+      div.style.borderBottom = "1px solid #ddd";
+
+      div.innerHTML = `
+        <strong>${data.email}</strong><br>
+        ${data.contenu}<br>
+        <small>${data.timestamp ? data.timestamp.toDate().toLocaleString() : ""}</small>
+      `;
+
+      messagesContainer.appendChild(div);
+    });
+  });
+}
 
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
@@ -64,6 +115,8 @@ onAuthStateChanged(auth, (user) => {
     statusEl.classList.add("connected");
     statusEl.classList.remove("disconnected");
     postForm.style.display = "block";
+    if (messagesSection) messagesSection.style.display = "block";
+    startMessagesListener();
     emailInput.disabled = true;
     passwordInput.disabled = true;
     signupBtn.disabled = true;
@@ -72,6 +125,8 @@ onAuthStateChanged(auth, (user) => {
     statusEl.classList.add("disconnected");
     statusEl.classList.remove("connected");
     postForm.style.display = "none";
+    if (messagesSection) messagesSection.style.display = "none";
+    stopMessagesListener();
     emailInput.disabled = false;
     passwordInput.disabled = false;
     signupBtn.disabled = false;
